@@ -1,0 +1,31 @@
+{
+  "log-path": "/tmp",
+  "connections":
+  [
+    {
+      "type": "tcp",
+      "proccess": ".",
+      "ports": "1234",
+      "actions":
+      [
+        {
+          "trigger": ".+asdf.+",
+          "target": "remote",
+          "target-params": {
+            "address": "0.0.0.0:1234"
+          }
+        },
+        {
+          "trigger": ".+abc.+",
+          "target": "reply",
+          "target-params": {
+            "message": "{0-10}asdf"
+          }
+        }
+      ]
+    },
+    {
+      "type":"tcp",
+    }
+  ]
+}
