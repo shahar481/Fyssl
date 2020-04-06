@@ -4,7 +4,8 @@
   [
     {
       "type": "tcp",
-      "proccess": ".",
+      "params": {},
+      "process": ".",
       "ports": "1234",
       "actions":
       [
@@ -25,7 +26,16 @@
       ]
     },
     {
-      "type":"tcp",
+      "type":"ssl",
+      "params": {
+        "key-path": "/tmp/key",
+        "cert-path": "/tmp/cert"
+      },
+      "proccess": ".",
+      "target": "remote",
+      "target-params": {
+        "address": "127.0.0.1:1758"
+      }
     }
   ]
 }
