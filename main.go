@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"fyssl/config"
-	"log"
 )
 
 func main() {
-	config.SetConfigPath("/home/shahar/go/src/fyssl/examples/config.json")
+	config.SetConfigPath("/home/shahar/go/src/fyssl/config/examples/config.json")
 	cfg := config.GetConfig()
-	log.Println(cfg)
+	fmt.Printf("%+v\n", cfg)
 }

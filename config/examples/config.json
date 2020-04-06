@@ -31,11 +31,17 @@
         "key-path": "/tmp/key",
         "cert-path": "/tmp/cert"
       },
-      "proccess": ".",
-      "target": "remote",
-      "target-params": {
-        "address": "127.0.0.1:1758"
-      }
+      "process": ".",
+      "ports": "100-200",
+      "actions": [
+        {
+          "trigger": ".",
+          "target": "remote",
+          "target-params": {
+            "address": "127.0.0.1:1758"
+          }
+        }
+      ]
     }
   ]
 }
