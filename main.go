@@ -1,8 +1,12 @@
 package main
 
-import "fyssl/config_reader"
+import (
+	"fyssl/config"
+	"log"
+)
 
 func main() {
-	config_reader.Test()
-	print("Hello world!")
+	config.SetConfigPath("/home/shahar/go/src/fyssl/examples/config.json")
+	cfg := config.GetConfig()
+	log.Println(cfg)
 }
