@@ -9,9 +9,9 @@ type Config struct {
 // Connection represents a connection that fyssl handles
 type Connection struct {
 	ConnectionType string `json:"type"`
+	ListenAddress string `json:"listen-address"`
+	ConnectAddress string `json:"connect-address"`
 	Params interface{} `json:"params"`
-	ProcessRegex string `json:"process"`
-	PortRange	string `json:"ports"`
 	Actions []Action `json:"actions"`
 }
 
