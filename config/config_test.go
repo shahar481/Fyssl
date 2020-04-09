@@ -14,7 +14,8 @@ func TestGetConfig(t *testing.T) {
 	connection.ConnectionType = "tcp"
 	connection.ListenAddress = "0.0.0.0:4576"
 	connection.ConnectAddress = "127.0.0.1:1234"
-	connection.Params = map[string]interface{}{
+	connection.Params = map[string]interface{}{}
+	connection.Modules = map[string]interface{}{
 		"catch": map[string]interface{} {
 			"ports": "1234",
 			"process":".",
@@ -43,15 +44,15 @@ func TestGetConfig(t *testing.T) {
 	connection.ListenAddress = "0.0.0.0:15689"
 	connection.ConnectAddress = "127.0.0.1:1876"
 	connection.Params = map[string]interface {}{
+		"key-path":"/tmp/key",
+		"cert-path":"/tmp/cert",
+	}
+	connection.Modules = map[string]interface{} {
 		"catch": map[string]interface {} {
 			"process": ".",
 			"ports": "100-200",
 		},
-		"key-path":"/tmp/key",
-		"cert-path":"/tmp/cert",
 	}
-	//connection.ProcessRegex = "."
-	//connection.PortRange = "100-200"
 
 	var secondActions []Action
 	action.TriggerRegex = "."

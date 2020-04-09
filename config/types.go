@@ -12,6 +12,7 @@ type Connection struct {
 	ListenAddress string `json:"listen-address"`
 	ConnectAddress string `json:"connect-address"`
 	Params interface{} `json:"params"`
+	Modules interface{} `json:"modules"`
 	Actions []Action `json:"actions"`
 }
 
