@@ -6,8 +6,9 @@
       "type": "tcp",
       "listen-address": "0.0.0.0:4576",
       "connect-address": "127.0.0.1:1234",
-      "params": {
-        "catch" : {
+      "params": {},
+      "modules": {
+        "catch": {
           "process": ".",
           "ports": "1234"
         }
@@ -36,12 +37,14 @@
       "listen-address": "0.0.0.0:15689",
       "connect-address": "127.0.0.1:1876",
       "params": {
+        "key-path": "/tmp/key",
+        "cert-path": "/tmp/cert"
+      },
+      "modules": {
         "catch": {
           "process": ".",
           "ports": "100-200"
-        },
-        "key-path": "/tmp/key",
-        "cert-path": "/tmp/cert"
+        }
       },
       "actions": [
         {
