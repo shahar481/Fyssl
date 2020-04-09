@@ -1,0 +1,58 @@
+{
+  "log-path": "/tmp",
+  "connections":
+  [
+    {
+      "type": "tcp",
+      "listen-address": "0.0.0.0:4576",
+      "connect-address": "127.0.0.1:1234",
+      "params": {
+        "catch" : {
+          "process": ".",
+          "ports": "1234"
+        }
+      },
+      "actions":
+      [
+        {
+          "trigger": ".+asdf.+",
+          "target": "remote",
+          "target-params": {
+            "listener-socket-address": "0.0.0.0:12345",
+            "sender-socket-address": "0.0.0.0:12346"
+          }
+        },
+        {
+          "trigger": ".+abc.+",
+          "target": "reply",
+          "target-params": {
+            "message": "{0-10}asdf"
+          }
+        }
+      ]
+    },
+    {
+      "type":"ssl",
+      "listen-address": "0.0.0.0:15689",
+      "connect-address": "127.0.0.1:1876",
+      "params": {
+        "catch": {
+          "process": ".",
+          "ports": "100-200"
+        },
+        "key-path": "/tmp/key",
+        "cert-path": "/tmp/cert"
+      },
+      "actions": [
+        {
+          "trigger": ".",
+          "target": "remote",
+          "target-params": {
+            "listener-socket-address": "127.0.0.1:1758",
+            "sender-socket-address": ""
+          }
+        }
+      ]
+    }
+  ]
+}
