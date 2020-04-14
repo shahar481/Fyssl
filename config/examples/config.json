@@ -3,6 +3,7 @@
   "connections":
   [
     {
+      "name": "tcp-test",
       "type": "tcp",
       "listen-address": "0.0.0.0:4576",
       "connect-address": "127.0.0.1:1234",
@@ -16,16 +17,20 @@
       "actions":
       [
         {
+          "name": "python-script-processor",
           "trigger": ".+asdf.+",
           "target": "remote",
+          "dump": false,
           "target-params": {
             "listener-socket-address": "0.0.0.0:12345",
             "sender-socket-address": "0.0.0.0:12346"
           }
         },
         {
+          "name": "asdf-replier",
           "trigger": ".+abc.+",
           "target": "reply",
+          "dump": true,
           "target-params": {
             "message": "{0-10}asdf"
           }
@@ -33,6 +38,7 @@
       ]
     },
     {
+      "name": "ssl-test",
       "type":"ssl",
       "listen-address": "0.0.0.0:15689",
       "connect-address": "127.0.0.1:1876",
@@ -48,8 +54,10 @@
       },
       "actions": [
         {
+          "name": "ruby-script-processor",
           "trigger": ".",
           "target": "remote",
+          "dump": false,
           "target-params": {
             "listener-socket-address": "127.0.0.1:1758",
             "sender-socket-address": ""

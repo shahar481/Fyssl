@@ -2,7 +2,10 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"regexp"
+	"slogger"
 	"sync"
 )
 
@@ -14,6 +17,7 @@ var once sync.Once
 func GetConfig() *Config {
 	once.Do(func() {
 		config = readConfigFile()
+		initConnections()
 	})
 	return config
 }
@@ -30,7 +34,30 @@ func readConfigFile() *Config {
 	if err != nil {
 		panic(err)
 	}
+
 	return config
+}
+
+func initConnections() {
+	for index, _ := range config.Connections {
+		if len(config.Connections[index].ListenAddress) == 0 {
+			config.Connections[index].RandomizeListenAddress = true
+		} else {
+			config.Connections[index].RandomizeListenAddress = false
+		}
+		initActions(&config.Connections[index])
+	}
+}
+
+func initActions(connection *Connection) {
+	for index, _ := range connection.Actions {
+		compiled, err := regexp.Compile(connection.Actions[index].TriggerRegex)
+		if err != nil {
+			slogger.Error(fmt.Sprintf("Error compiling trigger number %d in connection-%s",index, connection.Name))
+			panic("Error compiling regex")
+		}
+		connection.Actions[index].CompiledTrigger = compiled
+	}
 }
 
 // SetConfigPath sets the config path to read the config from.
