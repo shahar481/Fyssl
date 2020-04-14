@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/stretchr/testify/assert"
+	"regexp"
 	"testing"
 )
 
@@ -11,6 +12,7 @@ func TestGetConfig(t *testing.T) {
 	var connections []Connection
 
 	var connection Connection
+	connection.Name = "tcp-test"
 	connection.ConnectionType = "tcp"
 	connection.ListenAddress = "0.0.0.0:4576"
 	connection.ConnectAddress = "127.0.0.1:1234"
@@ -24,7 +26,14 @@ func TestGetConfig(t *testing.T) {
 	var actions []Action
 
 	var action Action
+	action.Name = "python-script-processor"
 	action.TriggerRegex = ".+asdf.+"
+	action.DumpLogPackets = false
+	compiled, err := regexp.Compile(action.TriggerRegex)
+	if err != nil {
+		panic("Error compiling regex")
+	}
+	action.CompiledTrigger = compiled
 	action.Target = "remote"
 	action.TargetParams = map[string]interface {}{
 		"listener-socket-address":"0.0.0.0:12345",
@@ -32,7 +41,14 @@ func TestGetConfig(t *testing.T) {
 	}
 	actions = append(actions, action)
 
+	action.Name = "asdf-replier"
 	action.TriggerRegex = ".+abc.+"
+	compiled, err = regexp.Compile(action.TriggerRegex)
+	if err != nil {
+		panic("Error compiling regex")
+	}
+	action.CompiledTrigger = compiled
+	action.DumpLogPackets = true
 	action.Target = "reply"
 	action.TargetParams = map[string]interface {}{"message":"{0-10}asdf"}
 	actions = append(actions, action)
@@ -40,6 +56,7 @@ func TestGetConfig(t *testing.T) {
 	connection.Actions = actions
 	connections = append(connections, connection)
 
+	connection.Name = "ssl-test"
 	connection.ConnectionType = "ssl"
 	connection.ListenAddress = "0.0.0.0:15689"
 	connection.ConnectAddress = "127.0.0.1:1876"
@@ -55,7 +72,14 @@ func TestGetConfig(t *testing.T) {
 	}
 
 	var secondActions []Action
+	action.Name = "ruby-script-processor"
 	action.TriggerRegex = "."
+	action.DumpLogPackets = false
+	compiled, err = regexp.Compile(action.TriggerRegex)
+	if err != nil {
+		panic("Error compiling regex")
+	}
+	action.CompiledTrigger = compiled
 	action.Target = "remote"
 	action.TargetParams = map[string]interface {}{
 		"listener-socket-address":"127.0.0.1:1758",

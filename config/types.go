@@ -1,5 +1,7 @@
 package config
 
+import "regexp"
+
 // Config is the root of the config file. Meant to parse the json config file.
 type Config struct {
 	LogPath	string `json:"log-path"`
@@ -8,7 +10,9 @@ type Config struct {
 
 // Connection represents a connection that fyssl handles
 type Connection struct {
+	Name string `json:"name"`
 	ConnectionType string `json:"type"`
+	RandomizeListenAddress bool
 	ListenAddress string `json:"listen-address"`
 	ConnectAddress string `json:"connect-address"`
 	Params interface{} `json:"params"`
@@ -18,8 +22,11 @@ type Connection struct {
 
 // Action represents what we should do in each connection
 type Action struct {
+	Name string `json:"name"`
 	TriggerRegex string `json:"trigger"`
+	CompiledTrigger *regexp.Regexp
 	Target string `json:"target"`
+	DumpLogPackets bool `json:"dump"`
 	TargetParams interface{} `json:"target-params"`
 }
 
