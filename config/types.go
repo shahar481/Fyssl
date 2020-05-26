@@ -11,8 +11,10 @@ type Config struct {
 // Connection represents a connection that fyssl handles
 type Connection struct {
 	Name string `json:"name"`
+	Id int
 	ConnectionType string `json:"type"`
 	RandomizeListenAddress bool
+	ActiveConnections map[string]ConnectionStats
 	ListenAddress string `json:"listen-address"`
 	ConnectAddress string `json:"connect-address"`
 	Params interface{} `json:"params"`
@@ -23,6 +25,7 @@ type Connection struct {
 // Action represents what we should do in each connection
 type Action struct {
 	Name string `json:"name"`
+	Id int
 	TriggerRegex string `json:"trigger"`
 	CompiledTrigger *regexp.Regexp
 	Target string `json:"target"`
@@ -30,3 +33,7 @@ type Action struct {
 	TargetParams interface{} `json:"target-params"`
 }
 
+type ConnectionStats struct {
+	BytesTransferred int
+	ActionsCaught int
+}

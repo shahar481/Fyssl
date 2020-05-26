@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyssl/config"
 	"fyssl/connection/forwarder"
+	"fyssl/connection/forwarder/base"
 	"fyssl/connection/utils"
 	"net"
 	"slogger"
@@ -14,39 +15,53 @@ const (
 	connType = "tcp"
 )
 
-func StartListening(connection *config.Connection) {
-	slogger.Info(fmt.Sprintf("Initializing a tcp connection-%s", connection.Name))
-	l := getListeningSocket(connection)
-	defer l.Close()
+
+type Tcp struct {
+	Connection *config.Connection
+	listener net.Listener
+}
+
+func NewTcpForwarder(connection *config.Connection) base.Listener {
+	t := Tcp{
+		Connection: connection,
+	}
+	return t
+}
+
+func (t Tcp) StartListening() {
+	slogger.Info(fmt.Sprintf("Initializing a tcp connection-%s", t.Connection.Name))
+	t.startListeningSocket()
+	defer t.listener.Close()
 	for {
-		conn, err := l.Accept()
+		conn, err := t.listener.Accept()
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error accepting incomming connection at %s-%+v",connection.Name, err))
+			slogger.Error(fmt.Sprintf("Error accepting incomming connection at %s-%+v",t.Connection.Name, err))
 		}
-		go forwardConnection(conn, connection)
+		go t.forwardConnection(conn)
 	}
 }
 
-func getListeningSocket(connection *config.Connection) net.Listener {
+func (t *Tcp) startListeningSocket() {
 	for {
-		l, err := net.Listen(connType, connection.ListenAddress)
+		l, err := net.Listen(connType, t.Connection.ListenAddress)
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error occured on connection %s on address %s-%+v",connection.Name, connection.ListenAddress, err))
+			slogger.Error(fmt.Sprintf("Error occured on connection %s on address %s-%+v",t.Connection.Name, t.Connection.ListenAddress, err))
 			time.Sleep(forwarder.ListenErrorTimeout * time.Second)
-			utils.SetListenAddress(connection)
+			utils.SetListenAddress(t.Connection)
 		} else {
-			slogger.Info(fmt.Sprintf("Started listening on connection %s on address %s", connection.Name, connection.ListenAddress))
-			return l
+			slogger.Info(fmt.Sprintf("Started listening on connection %s on address %s", t.Connection.Name, t.Connection.ListenAddress))
+			t.listener = l
+			return
 		}
 	}
 }
 
-func forwardConnection(receiver net.Conn, connection *config.Connection) {
-	sender, err := net.Dial(connType, connection.ConnectAddress)
+func (t Tcp) forwardConnection(receiver net.Conn) {
+	sender, err := net.Dial(connType, t.Connection.ConnectAddress)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Couldn't connect to %s on connection %s-%+v", connection.ConnectAddress, connection.Name, err))
+		slogger.Error(fmt.Sprintf("Couldn't connect to %s on connection %s-%+v", t.Connection.ConnectAddress, t.Connection.Name, err))
 		receiver.Close()
 		return
 	}
-	forwarder.StartForwardSockets(receiver, sender, connection)
+	forwarder.StartForwardSockets(receiver, sender, t.Connection)
 }

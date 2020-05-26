@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"fyssl/config"
 	"fyssl/connection/actions"
+	"fyssl/connection/actions/targets/base"
 	"net"
 	"slogger"
 )
@@ -15,22 +16,30 @@ func StartForwardSockets(first net.Conn, second net.Conn, connection *config.Con
 }
 
 func forwardSockets(receiver net.Conn, sender net.Conn, connection *config.Connection) {
-	var buf = make([]byte, 1024)
+	ActiveActions := make(map[string]base.Target)
 	for {
+		var buf = make([]byte, 1024)
 		copy(buf, make([]byte, len(buf)))
-		_, err := receiver.Read(buf)
+		length, err := receiver.Read(buf)
+		cutMessage :=  buf[:length]
+		buf = nil
 		if err != nil {
-			slogger.Info(fmt.Sprintf("Connection closed on %s", connection.Name))
-			receiver.Close()
-			sender.Close()
+			closeConnection(receiver, sender, ActiveActions)
 			return
 		}
-		actions.ProcessActions(&buf, receiver, connection)
-		_, err = sender.Write(buf)
+		cutMessage, ActiveActions = actions.ProcessActions(&cutMessage, receiver, sender, &ActiveActions, connection)
+		_, err = sender.Write(cutMessage)
 		if err != nil {
-			receiver.Close()
-			sender.Close()
+			closeConnection(receiver, sender, ActiveActions)
 			return
 		}
+	}
+}
+
+func closeConnection(receiver net.Conn, sender net.Conn, ActiveActions map[string]base.Target) {
+	receiver.Close()
+	sender.Close()
+	for _, action := range ActiveActions {
+		action.Close()
 	}
 }

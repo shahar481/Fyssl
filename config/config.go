@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"regexp"
 	"slogger"
 	"sync"
@@ -40,6 +41,7 @@ func readConfigFile() *Config {
 
 func initConnections() {
 	for index, _ := range config.Connections {
+		config.Connections[index].Id = index
 		if len(config.Connections[index].ListenAddress) == 0 {
 			config.Connections[index].RandomizeListenAddress = true
 		} else {
@@ -57,6 +59,13 @@ func initActions(connection *Connection) {
 			panic("Error compiling regex")
 		}
 		connection.Actions[index].CompiledTrigger = compiled
+		connection.Actions[index].Id = index
+	}
+}
+
+func initRemote(action *Action) {
+	if action.Target == "remote" {
+		action.TargetParams.(map[string]interface{})["sockets"] = make(map[string]net.Conn)
 	}
 }
 

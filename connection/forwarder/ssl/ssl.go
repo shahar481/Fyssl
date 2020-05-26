@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"fyssl/config"
 	"fyssl/connection/forwarder"
+	"fyssl/connection/forwarder/base"
 	"fyssl/connection/utils"
 	"net"
 	"slogger"
@@ -15,56 +16,71 @@ const (
 	protocol = "tcp"
 )
 
-func StartListening(connection *config.Connection) {
-	slogger.Info(fmt.Sprintf("Initializing an ssl connection-%s",connection.Name))
-	tlsCfg := createTlsConfig(connection)
-	l := getListeningSocket(connection, tlsCfg)
-	defer l.Close()
+type Ssl struct {
+	Connection *config.Connection
+	listener net.Listener
+	tlsCfg *tls.Config
+}
+
+func NewSslForwarder(connection *config.Connection) base.Listener {
+	s := Ssl{
+		Connection: connection,
+	}
+	return s
+}
+
+func (s Ssl) StartListening() {
+	slogger.Info(fmt.Sprintf("Initializing an ssl connection-%s",s.Connection.Name))
+	s.createTlsConfig()
+	s.startListeningSocket()
+	defer s.listener.Close()
 	for {
-		conn, err := l.Accept()
+		conn, err := s.listener.Accept()
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error accepting incoming connection at %s-%+v", connection.Name, err))
+			slogger.Error(fmt.Sprintf("Error accepting incoming connection at %s-%+v", s.Connection.Name, err))
 			continue
 		}
-		go forwardConnection(conn, connection, tlsCfg)
+		go s.forwardConnection(conn)
 	}
 }
 
-func getListeningSocket(connection *config.Connection, tlsCfg *tls.Config) net.Listener {
+func (s *Ssl) startListeningSocket() {
 	for {
-		l, err := tls.Listen(protocol, connection.ListenAddress, tlsCfg)
+		l, err := tls.Listen(protocol, s.Connection.ListenAddress, s.tlsCfg)
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error occured on %s on address %s-%+v",connection.Name,connection.ListenAddress,err))
+			slogger.Error(fmt.Sprintf("Error occured on %s on address %s-%+v", s.Connection.Name, s.Connection.ListenAddress,err))
 			time.Sleep(forwarder.ListenErrorTimeout * time.Second)
-			utils.SetListenAddress(connection)
+			utils.SetListenAddress(s.Connection)
 		} else {
-			slogger.Info(fmt.Sprintf("Started listening on connection %s on address %s", connection.Name, connection.ListenAddress))
-			return l
+			slogger.Info(fmt.Sprintf("Started listening on connection %s on address %s", s.Connection.Name, s.Connection.ListenAddress))
+			s.listener = l
+			return
 		}
 	}
 }
 
-func createTlsConfig(connection *config.Connection) *tls.Config {
-	tlsParams := connection.Params.(map[string]interface{})
+func (s *Ssl) createTlsConfig() {
+	tlsParams := s.Connection.Params.(map[string]interface{})
 	for {
 		cer, err := tls.LoadX509KeyPair(tlsParams["cert-path"].(string), tlsParams["key-path"].(string))
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error occured loading tls keys at connection:%s-%+v",connection.Name, err))
+			slogger.Error(fmt.Sprintf("Error occured loading tls keys at connection:%s-%+v",s.Connection.Name, err))
 			time.Sleep(forwarder.ListenErrorTimeout * time.Second)
 			continue
 		}
 		config := &tls.Config{Certificates: []tls.Certificate{cer}, InsecureSkipVerify: true}
-		return config
+		s.tlsCfg = config
+		return
 	}
 
 }
 
-func forwardConnection(receiver net.Conn, connection *config.Connection, tlsCfg *tls.Config) {
-	sender, err := tls.Dial(protocol, connection.ConnectAddress, tlsCfg)
+func (s Ssl) forwardConnection(receiver net.Conn) {
+	sender, err := tls.Dial(protocol, s.Connection.ConnectAddress, s.tlsCfg)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Couldn't connect to %s on connection %s-%+v", connection.ConnectAddress, connection.Name, err))
+		slogger.Error(fmt.Sprintf("Couldn't connect to %s on connection %s-%+v", s.Connection.ConnectAddress, s.Connection.Name, err))
 		receiver.Close()
 		return
 	}
-	forwarder.StartForwardSockets(receiver, sender, connection)
+	forwarder.StartForwardSockets(receiver, sender, s.Connection)
 }
