@@ -82,7 +82,7 @@ func TestGetConfig(t *testing.T) {
 	action.CompiledTrigger = compiled
 	action.Target = "remote"
 	action.TargetParams = map[string]interface {}{
-		"listener-socket-address":"127.0.0.1:1758",
+		"listener-socket-address":"127.0.0.1:17586",
 		"sender-socket-address": "",
 	}
 	secondActions = append(secondActions, action)

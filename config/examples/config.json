@@ -32,7 +32,7 @@
           "target": "reply",
           "dump": true,
           "target-params": {
-            "message": "{0-10}asdf"
+            "message": "*0-7*"
           }
         }
       ]
@@ -61,6 +61,26 @@
           "target-params": {
             "listener-socket-address": "127.0.0.1:1758",
             "sender-socket-address": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "manual-edit",
+      "type": "tcp",
+      "listen-address": "0.0.0.0:9999",
+      "connect-address": "127.0.0.1:8888",
+      "params": {},
+      "modules": {},
+      "actions": [
+        {
+          "name": "vim-opener",
+          "trigger": ".",
+          "target": "editor",
+          "dump": false,
+          "target-params": {
+            "editor": "/usr/bin/subl",
+            "args": "{file}"
           }
         }
       ]

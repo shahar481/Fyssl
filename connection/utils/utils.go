@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"fyssl/config"
 	"math/rand"
+	"net"
 	"slogger"
+	"strconv"
 	"time"
 )
 
@@ -24,4 +26,19 @@ func SetListenAddress(connection *config.Connection) {
 		connection.ListenAddress = randomizeListenAddress()
 		slogger.Debug(fmt.Sprintf("Randomized address for connection %s-%s",connection.Name, connection.ListenAddress))
 	}
+}
+
+func IsListening(sock net.Conn, connection *config.Connection) bool {
+	if sock.LocalAddr().String() == connection.ListenAddress {
+		return true
+	}
+	return false
+}
+
+func GetConnectionIdentifier(sock net.Conn) string {
+	return sock.LocalAddr().String() + "-" + sock.RemoteAddr().String()
+}
+
+func GetActionIdentifier(sock net.Conn, action *config.Action) string {
+	return GetConnectionIdentifier(sock) + "-" + strconv.Itoa(action.Id)
 }
