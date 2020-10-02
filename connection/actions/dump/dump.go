@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"fyssl/config"
+	"github.com/shahar481/fyssl/config"
 	"net"
 	"os"
 	"path"

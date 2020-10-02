@@ -2,9 +2,9 @@ package forwarder
 
 import (
 	"fmt"
-	"fyssl/config"
-	"fyssl/connection/actions"
-	"fyssl/connection/actions/targets/base"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/actions"
+	"github.com/shahar481/fyssl/connection/actions/targets/base"
 	"net"
 	"slogger"
 )

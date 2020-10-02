@@ -1,9 +1,9 @@
 package reply
 
 import (
-	"fyssl/config"
-	"fyssl/connection/actions/targets/base"
-	"fyssl/connection/actions/targets/reply/language"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/actions/targets/base"
+	"github.com/shahar481/fyssl/connection/actions/targets/reply/language"
 	"net"
 )
 
