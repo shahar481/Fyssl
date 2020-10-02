@@ -2,11 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"regexp"
-	"slogger"
 	"sync"
 )
 
@@ -55,7 +54,7 @@ func initActions(connection *Connection) {
 	for index, _ := range connection.Actions {
 		compiled, err := regexp.Compile(connection.Actions[index].TriggerRegex)
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error compiling trigger number %d in connection-%s",index, connection.Name))
+			log.Printf("Error compiling trigger number %d in connection-%s",index, connection.Name)
 			panic("Error compiling regex")
 		}
 		connection.Actions[index].CompiledTrigger = compiled

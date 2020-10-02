@@ -2,16 +2,16 @@ package editor
 
 import (
 	"fmt"
+	"github.com/fsnotify/fsnotify"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"github.com/shahar481/fyssl/connection/actions/targets/base"
-	"github.com/fsnotify/fsnotify"
 	"io/ioutil"
 	"math/rand"
 	"net"
 	"os"
 	"os/exec"
 	"path"
-	"slogger"
 	"strings"
 	"time"
 )
@@ -33,13 +33,12 @@ const (
 func (e *Editor) ProcessTarget(buffer *[]byte) (*[]byte, error) {
 	e.createPacketFile(buffer)
 	e.createArgs()
+	glog.Infof("Running %s %s", e.editorProgram, e.editorProgram)
 	c := exec.Command(e.editorProgram, e.editorArgs)
-	slogger.Debug(e.editorProgram)
-	slogger.Debug(e.editorArgs)
 	c.Start()
 	e.WaitForFileChange()
 	fileData := e.getFileData(buffer)
-	slogger.Info(fmt.Sprintf("Getting data from %s and deleting the file!", e.packetPath))
+	glog.Infof("Getting data from %s and deleting the file!", e.packetPath)
 	e.deleteFile()
 	return fileData, nil
 }
@@ -47,7 +46,7 @@ func (e *Editor) ProcessTarget(buffer *[]byte) (*[]byte, error) {
 func (e *Editor) deleteFile() {
 	err := os.Remove(e.packetPath)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Error deleting packet data file-%s,%+v", e.packetPath, err))
+		glog.Errorf("Error deleting packet data file-%s,%+v", e.packetPath, err)
 	}
 }
 
@@ -64,28 +63,28 @@ func (e *Editor) getFileData(buffer *[]byte) *[]byte {
 	if _, err := os.Stat(e.packetPath); err == nil {
 		content, err := ioutil.ReadFile(e.packetPath)     // the file is inside the local directory
 		if err != nil {
-			slogger.Error(fmt.Sprintf(fileCantBeReadErrorMessage, e.packetPath))
+			glog.Errorf(fileCantBeReadErrorMessage, e.packetPath)
 			return buffer
 		}
 		return &content
 	} else {
-		slogger.Error(fmt.Sprintf(fileCantBeReadErrorMessage, e.packetPath))
+		glog.Errorf(fileCantBeReadErrorMessage, e.packetPath)
 		return buffer
 	}
 }
 
 func (e *Editor) WaitForFileChange() {
-	slogger.Info(fmt.Sprintf("Waiting for modification of file-%s", e.packetPath))
+	glog.Infof("Waiting for modification of file-%s", e.packetPath)
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		slogger.Error(fmt.Sprintf(fileChangeErrorMessage, e.packetPath, err))
+		glog.Errorf(fileChangeErrorMessage, e.packetPath, err)
 		watcher.Close()
 		return
 	}
 
 	err = watcher.Add(e.packetPath)
 	if err != nil {
-		slogger.Error(fmt.Sprintf(fileChangeErrorMessage, e.packetPath, err))
+		glog.Errorf(fileChangeErrorMessage, e.packetPath, err)
 		watcher.Close()
 		return
 	}
@@ -95,7 +94,7 @@ func (e *Editor) WaitForFileChange() {
 		watcher.Close()
 		return
 	case err := <-watcher.Errors:
-		slogger.Error(fmt.Sprintf(fileChangeErrorMessage, e.packetPath, err))
+		glog.Errorf(fileChangeErrorMessage, e.packetPath, err)
 		watcher.Close()
 		return
 	}

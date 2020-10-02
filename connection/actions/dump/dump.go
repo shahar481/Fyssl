@@ -4,11 +4,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"net"
 	"os"
 	"path"
-	"slogger"
 	"time"
 )
 
@@ -22,14 +22,14 @@ func Packet(buffer *[]byte, receiver net.Conn, sender net.Conn, connection *conf
 
 	f, err := os.OpenFile(log, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Error opening the file for dumping in action:%s,%+v", action.Name, err))
+		glog.Errorf("Error opening the file for dumping in action:%s,%+v", action.Name, err)
 	}
 
 	defer f.Close()
 
 	logEntry := createDumpLog(buffer, receiver, sender)
 	if _, err = f.WriteString(logEntry); err != nil {
-		slogger.Error(fmt.Sprintf("Error dumping to file in action:%s,%+v", action.Name, err))
+		glog.Errorf("Error dumping to file in action:%s,%+v", action.Name, err)
 	}
 }
 
@@ -45,7 +45,7 @@ func createFolderPath(connection *config.Connection, action *config.Action) stri
 	folderPath := path.Join(cfg.LogPath, connection.Name, action.Name)
 	err := os.MkdirAll(folderPath, os.ModePerm)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Couldn't create folders for %s-%+v", action.Name, err))
+		glog.Errorf("Couldn't create folders for %s-%+v", action.Name, err)
 	}
 	return folderPath
 }
