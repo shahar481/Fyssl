@@ -20,6 +20,7 @@ type Editor struct {
 	packetPath string
 	editorProgram string
 	editorArgs string
+	ArgsTemplate string
 }
 
 const (
@@ -33,10 +34,11 @@ const (
 func (e *Editor) ProcessTarget(buffer *[]byte) (*[]byte, error) {
 	e.createPacketFile(buffer)
 	e.createArgs()
-	glog.Infof("Running %s %s", e.editorProgram, e.editorProgram)
+	glog.Infof("Running %s %s", e.editorProgram, e.editorArgs)
 	c := exec.Command(e.editorProgram, e.editorArgs)
 	c.Start()
 	e.WaitForFileChange()
+	c.Process.Kill()
 	fileData := e.getFileData(buffer)
 	glog.Infof("Getting data from %s and deleting the file!", e.packetPath)
 	e.deleteFile()
@@ -103,7 +105,7 @@ func (e *Editor) WaitForFileChange() {
 
 
 func (e *Editor) createArgs() {
-	e.editorArgs = strings.Replace(e.editorArgs, fileArg, e.packetPath, -1)
+	e.editorArgs = strings.Replace(e.ArgsTemplate, fileArg, e.packetPath, -1)
 }
 
 func (e *Editor) getTempFilePath() string {
@@ -131,7 +133,7 @@ func CreateEditor(sock net.Conn, connection *config.Connection, action *config.A
 	dict, _ := action.TargetParams.(map[string]interface{})
 	e := Editor{
 		editorProgram: dict["editor"].(string),
-		editorArgs: dict["args"].(string),
+		ArgsTemplate: dict["args"].(string),
 	}
 	return &e
 }
