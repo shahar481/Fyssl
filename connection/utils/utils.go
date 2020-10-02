@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"fyssl/config"
+	"github.com/shahar481/fyssl/config"
 	"math/rand"
 	"net"
 	"slogger"

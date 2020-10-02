@@ -2,10 +2,10 @@ package tcp
 
 import (
 	"fmt"
-	"fyssl/config"
-	"fyssl/connection/forwarder"
-	"fyssl/connection/forwarder/base"
-	"fyssl/connection/utils"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/forwarder"
+	"github.com/shahar481/fyssl/connection/forwarder/base"
+	"github.com/shahar481/fyssl/connection/utils"
 	"net"
 	"slogger"
 	"time"

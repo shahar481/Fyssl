@@ -4,9 +4,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"fyssl/config"
-	"fyssl/connection/actions/targets/base"
-	"fyssl/connection/utils"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/actions/targets/base"
+	"github.com/shahar481/fyssl/connection/utils"
 	"net"
 	"slogger"
 )

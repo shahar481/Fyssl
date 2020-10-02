@@ -1,8 +1,8 @@
 package drop
 
 import (
-	"fyssl/config"
-	"fyssl/connection/actions/targets/base"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/actions/targets/base"
 	"net"
 )
 

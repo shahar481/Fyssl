@@ -2,8 +2,8 @@ package language
 
 import (
 	"errors"
-	"fyssl/connection/actions/targets/reply/language/asterisk"
-	"fyssl/connection/actions/targets/reply/language/types"
+	"github.com/shahar481/fyssl/connection/actions/targets/reply/language/asterisk"
+	"github.com/shahar481/fyssl/connection/actions/targets/reply/language/types"
 )
 
 var keyToProcess = map[string]func (fullExpression string, buff *[]byte) (*[]byte, error) {

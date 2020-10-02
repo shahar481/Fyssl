@@ -1,12 +1,12 @@
 package main
 
 import (
+	"appliedgo.net/what"
 	"fmt"
-	"fyssl/config"
-	"fyssl/connection"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection"
 	"log"
 	"os"
-	"slogger"
 )
 
 func processArgs() {

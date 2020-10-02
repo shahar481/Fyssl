@@ -2,10 +2,10 @@ package connection
 
 import (
 	"bufio"
-	"fyssl/config"
-	"fyssl/connection/forwarder/base"
-	"fyssl/connection/forwarder/ssl"
-	"fyssl/connection/forwarder/tcp"
+	"github.com/shahar481/fyssl/config"
+	"github.com/shahar481/fyssl/connection/forwarder/base"
+	"github.com/shahar481/fyssl/connection/forwarder/ssl"
+	"github.com/shahar481/fyssl/connection/forwarder/tcp"
 	"os"
 	"slogger"
 )
