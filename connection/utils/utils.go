@@ -2,10 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"math/rand"
 	"net"
-	"slogger"
 	"strconv"
 	"time"
 )
@@ -24,7 +24,7 @@ func randomizeListenAddress() string {
 func SetListenAddress(connection *config.Connection) {
 	if connection.RandomizeListenAddress {
 		connection.ListenAddress = randomizeListenAddress()
-		slogger.Debug(fmt.Sprintf("Randomized address for connection %s-%s",connection.Name, connection.ListenAddress))
+		glog.Infof("Randomized address for connection %s-%s",connection.Name, connection.ListenAddress)
 	}
 }
 

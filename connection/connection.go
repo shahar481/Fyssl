@@ -2,12 +2,12 @@ package connection
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/shahar481/fyssl/config"
 	"github.com/shahar481/fyssl/connection/forwarder/base"
 	"github.com/shahar481/fyssl/connection/forwarder/ssl"
 	"github.com/shahar481/fyssl/connection/forwarder/tcp"
 	"os"
-	"slogger"
 )
 
 var protocolMap = map[string]func(config *config.Connection) base.Listener {
@@ -24,7 +24,7 @@ func StartConnections() {
 	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		slogger.Info(reader.ReadString('\n'))
+		fmt.Printf(reader.ReadString('\n'))
 	}
 }
 

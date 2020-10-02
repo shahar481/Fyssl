@@ -2,13 +2,12 @@ package ssl
 
 import (
 	"crypto/tls"
-	"fmt"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"github.com/shahar481/fyssl/connection/forwarder"
 	"github.com/shahar481/fyssl/connection/forwarder/base"
 	"github.com/shahar481/fyssl/connection/utils"
 	"net"
-	"slogger"
 	"time"
 )
 
@@ -30,14 +29,14 @@ func NewSslForwarder(connection *config.Connection) base.Listener {
 }
 
 func (s Ssl) StartListening() {
-	slogger.Info(fmt.Sprintf("Initializing an ssl connection-%s",s.Connection.Name))
+	glog.Infof("Initializing an ssl connection-%s",s.Connection.Name)
 	s.createTlsConfig()
 	s.startListeningSocket()
 	defer s.listener.Close()
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error accepting incoming connection at %s-%+v", s.Connection.Name, err))
+			glog.Infof("Error accepting incoming connection at %s-%+v", s.Connection.Name, err)
 			continue
 		}
 		go s.forwardConnection(conn)
@@ -48,11 +47,11 @@ func (s *Ssl) startListeningSocket() {
 	for {
 		l, err := tls.Listen(protocol, s.Connection.ListenAddress, s.tlsCfg)
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error occured on %s on address %s-%+v", s.Connection.Name, s.Connection.ListenAddress,err))
+			glog.Infof("Error occured on %s on address %s-%+v", s.Connection.Name, s.Connection.ListenAddress,err)
 			time.Sleep(forwarder.ListenErrorTimeout * time.Second)
 			utils.SetListenAddress(s.Connection)
 		} else {
-			slogger.Info(fmt.Sprintf("Started listening on connection %s on address %s", s.Connection.Name, s.Connection.ListenAddress))
+			glog.Infof("Started listening on connection %s on address %s", s.Connection.Name, s.Connection.ListenAddress)
 			s.listener = l
 			return
 		}
@@ -64,7 +63,7 @@ func (s *Ssl) createTlsConfig() {
 	for {
 		cer, err := tls.LoadX509KeyPair(tlsParams["cert-path"].(string), tlsParams["key-path"].(string))
 		if err != nil {
-			slogger.Error(fmt.Sprintf("Error occured loading tls keys at connection:%s-%+v",s.Connection.Name, err))
+			glog.Errorf("Error occured loading tls keys at connection:%s-%+v",s.Connection.Name, err)
 			time.Sleep(forwarder.ListenErrorTimeout * time.Second)
 			continue
 		}
@@ -78,7 +77,7 @@ func (s *Ssl) createTlsConfig() {
 func (s Ssl) forwardConnection(receiver net.Conn) {
 	sender, err := tls.Dial(protocol, s.Connection.ConnectAddress, s.tlsCfg)
 	if err != nil {
-		slogger.Error(fmt.Sprintf("Couldn't connect to %s on connection %s-%+v", s.Connection.ConnectAddress, s.Connection.Name, err))
+		glog.Errorf("Couldn't connect to %s on connection %s-%+v", s.Connection.ConnectAddress, s.Connection.Name, err)
 		receiver.Close()
 		return
 	}

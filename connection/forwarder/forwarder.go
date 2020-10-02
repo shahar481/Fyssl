@@ -2,15 +2,15 @@ package forwarder
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"github.com/shahar481/fyssl/connection/actions"
 	"github.com/shahar481/fyssl/connection/actions/targets/base"
 	"net"
-	"slogger"
 )
 
 func StartForwardSockets(first net.Conn, second net.Conn, connection *config.Connection) {
-	slogger.Info(fmt.Sprintf("Forwarding a connection in %s", connection.Name))
+	glog.Infof(fmt.Sprintf("Forwarding a connection in %s", connection.Name))
 	go forwardSockets(first, second, connection)
 	go forwardSockets(second, first, connection)
 }

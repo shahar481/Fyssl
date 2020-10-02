@@ -3,12 +3,11 @@ package remote
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
+	"github.com/golang/glog"
 	"github.com/shahar481/fyssl/config"
 	"github.com/shahar481/fyssl/connection/actions/targets/base"
 	"github.com/shahar481/fyssl/connection/utils"
 	"net"
-	"slogger"
 )
 
 const (
@@ -55,7 +54,7 @@ func (r *Remote) ProcessTarget(buffer *[]byte) (*[]byte, error) {
 }
 
 func (r *Remote) printError(err error) {
-	slogger.Info(fmt.Sprintf("Error occured in connection: %s, action: %s - %+v", r.connection.Name, r.action.Name, err))
+	glog.Infof("Error occured in connection: %s, action: %s - %+v", r.connection.Name, r.action.Name, err)
 }
 
 func (r *Remote) startRemoteForwarding(buffer *[]byte) (*[]byte, error) {
